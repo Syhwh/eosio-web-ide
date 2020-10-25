@@ -13,6 +13,7 @@ interface PostData {
     user?: string;
     reply_to?: number;
     content?: string;
+    likes?: number;
 };
 
 interface PostFormState {
@@ -33,7 +34,8 @@ class PostForm extends React.Component<{}, PostFormState> {
                 id: 0,
                 user: 'bob',
                 reply_to: 0,
-                content: 'This is a test'
+                content: 'This is a test',
+                likes: 0
             },
             error: '',
         };
@@ -58,9 +60,9 @@ class PostForm extends React.Component<{}, PostFormState> {
                         data: this.state.data,
                     }]
                 }, {
-                    blocksBehind: 3,
-                    expireSeconds: 30,
-                });
+                blocksBehind: 3,
+                expireSeconds: 30,
+            });
             console.log(result);
             this.setState({ error: '' });
         } catch (e) {
@@ -70,6 +72,7 @@ class PostForm extends React.Component<{}, PostFormState> {
                 this.setState({ error: '' + e });
         }
     }
+
 
     render() {
         return <div>
@@ -107,10 +110,19 @@ class PostForm extends React.Component<{}, PostFormState> {
                             onChange={e => this.setData({ content: e.target.value })}
                         /></td>
                     </tr>
+                    <tr>
+                        <td>Likes</td>
+                        <td><input
+                            style={{ width: 500 }}
+                            value={this.state.data.likes}
+                            onChange={e => this.setData({ likes: parseInt(e.target.value) })}
+                        /></td>
+                    </tr>
                 </tbody>
             </table>
             <br />
             <button onClick={e => this.post()}>Post</button>
+
             {this.state.error && <div>
                 <br />
                 Error:
@@ -135,13 +147,14 @@ class Messages extends React.Component<{}, { content: string }> {
                     json: true, code: 'talk', scope: '', table: 'message', limit: 1000,
                 });
                 let content =
-                    'id          reply_to      user          content\n' +
+                    'id          reply_to      user     likes           content\n' +
                     '=============================================================\n';
                 for (let row of rows.rows)
                     content +=
                         (row.id + '').padEnd(12) +
                         (row.reply_to + '').padEnd(12) + '  ' +
                         row.user.padEnd(14) +
+                        row.likes + '  ' +
                         row.content + '\n';
                 this.setState({ content });
             } catch (e) {
